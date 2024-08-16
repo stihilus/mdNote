@@ -1,0 +1,448 @@
+body {
+  font-family: 'Cascadia Mono', monospace;
+  font-size: 11px;
+  background-image: url('backgrounds/background.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.notepad {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  width: 1000px;
+  /* Increased width */
+  height: 700px;
+  /* Increased height */
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  resize: both;
+  max-width: 100vw;
+  max-height: 100vh;
+  position: relative;
+}
+
+.header {
+  background-color: rgba(26, 26, 26, 0.8);
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.content {
+  display: flex;
+  flex-grow: 1;
+  height: calc(100% - 40px);
+}
+
+.sidebar {
+  width: 200px;
+  /* Fixed width */
+  flex-shrink: 0;
+  /* Prevent shrinking */
+  background-color: rgba(26, 26, 26, 0.8);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.document-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: rgb(21 21 21 / 80%);
+}
+
+.document-title {
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  /* Added to position the pseudo-element */
+}
+
+#currentDocTitle {
+  margin-right: 10px;
+}
+
+.document-title:hover::after {
+  content: 'edit';
+  position: absolute;
+  right: -30px;
+  /* Adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #FFB45D;
+  /* Grey color */
+  font-weight: normal;
+}
+
+.title {
+  font-size: 12px;
+  padding: 14px;
+  color: #808080;
+  /* Changed to gray */
+}
+
+.sidebar-buttons {
+  margin-top: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-buttons button,
+.sidebar-buttons input[type="file"] {
+  width: 100%;
+  margin-bottom: 5px;
+  margin-left: 0;
+}
+
+.sidebar-divider {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #444;
+  margin: 10px 0;
+}
+
+.editor-container {
+  display: flex;
+  height: calc(100% - 40px);
+}
+
+#markdownEditor,
+#previewPane {
+  width: 50%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+#markdownEditor {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  resize: none;
+  font-family: 'Cascadia Mono', monospace;
+  font-size: 11px;
+  caret-color: #FFB45D;
+}
+
+#previewPane {
+  background-color: rgba(20, 20, 20, 0.8);
+  /* Darker gray for preview */
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+li {
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+li.active {
+  background-color: #333;
+  color: #FFB45D;
+  /* Changed active document color */
+}
+
+button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin-left: 5px;
+  cursor: pointer;
+  font-family: 'Cascadia Mono', monospace;
+  font-size: 11px;
+}
+
+/* ... (rest of the styles remain the same) ... */
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+li {
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+li.active {
+  background-color: rgba(51, 51, 51, 0.8);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #1e1e1e;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+  color: #fff;
+}
+
+#cheatSheetModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#cheatSheetContent {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#cheatSheetContent h3 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+#cheatSheetContent pre {
+  background-color: #2a2a2a;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.modal-buttons {
+  text-align: right;
+  margin-top: 20px;
+}
+
+#fileInput {
+  display: none;
+}
+
+.drop-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #fff;
+}
+
+textarea::selection {
+  background-color: #FFB45D;
+  color: #000;
+  /* You might want to set this to ensure readability */
+}
+
+/* For Firefox */
+textarea::-moz-selection {
+  background-color: #FFB45D;
+  color: #000;
+}
+
+.title-input {
+  font-size: 12px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 2px 5px;
+  font-family: 'Cascadia Mono', monospace;
+  caret-color: #FFB45D;
+  /* Set the cursor color */
+}
+
+.title-input::selection {
+  background-color: #FFB45D;
+  color: #000;
+}
+
+.title-input::-moz-selection {
+  background-color: #FFB45D;
+  color: #000;
+}
+
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background-color: rgba(26, 26, 26, 0.8);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar-buttons {
+  margin-top: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-buttons button,
+.sidebar-buttons input[type="file"] {
+  width: 100%;
+  margin-bottom: 5px;
+  margin-left: 0;
+}
+
+.editor-container {
+  display: flex;
+  height: calc(100% - 40px);
+}
+
+#markdownEditor,
+#previewPane {
+  width: 50%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  flex: 1;
+  /* This ensures both panes maintain 50:50 ratio */
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffffff;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff transparent;
+}
+
+#tagInput {
+  width: 100px;
+  /* Reduced width to approximately 10 characters */
+  margin-left: 10px;
+  padding: 2px 5px;
+  font-size: 11px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 3px;
+  font-family: 'Cascadia Mono', monospace;
+}
+
+#tagInput::placeholder {
+  color: #888;
+}
+
+#tagDisplay {
+    padding-left: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: rgb(21 21 21 / 80%);
+}
+
+.tag-pill {
+  display: inline-block;
+  background-color: #444;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 2px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-family: 'Cascadia Mono', monospace;
+}
+
+.tag-pill .remove-tag {
+  cursor: pointer;
+  margin-left: 5px;
+  color: #aaa;
+}
+
+.tag-pill .remove-tag:hover {
+  color: #fff;
+}
+
+#tagFilter {
+  width: 90%;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  padding: 5px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 3px;
+  font-family: 'Cascadia Mono', monospace;
+  font-size: 11px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: 50%;
+}
+
+#tagFilter:focus {
+  outline: none;
+  border-color: #FFB45D;
+}

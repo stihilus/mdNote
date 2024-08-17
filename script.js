@@ -158,6 +158,7 @@ function loadNote(key) {
     }
 
     const noteData = getNoteData(key);
+    console.log('Loading note:', key, 'Data:', noteData);  // Add this line
 
     if (!noteData || noteData.content === undefined) {
         console.warn(`Note "${key}" not found. Loading first available note.`);
@@ -165,7 +166,7 @@ function loadNote(key) {
 
         if (firstNoteKey) {
             currentNote = firstNoteKey;
-            loadNote(firstNoteKey); // Recursive call with the first available note
+            loadNote(firstNoteKey);
         } else {
             console.error("No valid notes found. Creating a new note.");
             newNote();
@@ -176,11 +177,25 @@ function loadNote(key) {
     currentNote = key;
     markdownEditor.value = noteData.content || '';
     currentDocTitle.textContent = key;
-    currentTag = ''; // Clear the tag filter
-    document.getElementById('tagFilter').value = ''; // Reset the dropdown
+    currentTag = '';
+    document.getElementById('tagFilter').value = '';
     updateDocumentList();
     renderMarkdown();
     displayTags();
+
+    // Ensure all elements in the document header are visible
+    document.getElementById('tagInput').style.display = 'inline-block';
+    document.querySelector('button[onclick="saveNote()"]').style.display = 'inline-block';
+    document.querySelector('button[onclick="exportNote()"]').style.display = 'inline-block';
+    document.querySelector('button[onclick="showDeleteModal()"]').style.display = 'inline-block';
+
+    // Hide the save title button if it exists
+    const saveTitleButton = document.getElementById('saveTitleButton');
+    if (saveTitleButton) {
+        saveTitleButton.style.display = 'none';
+    }
+
+    console.log('Header elements visibility set');  // Add this line
 }
 
 function renderMarkdown() {
@@ -229,10 +244,10 @@ function newNote() {
 function exportNote() {
     if (currentNote) {
         const content = localStorage.getItem(currentNote);
-        const blob = new Blob([content], { type: 'text/plain' });
+        const blob = new Blob([content], { type: 'text/markdown' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `${currentNote}.txt`;
+        a.download = `${currentNote}.md`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -337,7 +352,7 @@ function handleFileUpload(event) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const content = e.target.result;
-            let fileName = file.name.replace('.txt', '').replace('.md', '');
+            let fileName = file.name.replace('.md', '');
             if (localStorage.getItem(fileName)) {
                 let counter = 1;
                 while (localStorage.getItem(`${fileName} (${counter})`)) {
@@ -345,7 +360,7 @@ function handleFileUpload(event) {
                 }
                 fileName = `${fileName} (${counter})`;
             }
-            localStorage.setItem(fileName, content);
+            setNoteData(fileName, content, []); // Use setNoteData instead of localStorage.setItem
             loadNote(fileName);
         };
         reader.readAsText(file);
@@ -363,7 +378,7 @@ document.addEventListener('dragenter', (e) => {
     dragCounter++;
     if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
         const item = e.dataTransfer.items[0];
-        if (item.kind === 'file' && item.type === 'text/plain') {
+        if (item.kind === 'file' && (item.type === 'text/markdown' || item.type === '')) {
             document.getElementById('dropOverlay').style.display = 'flex';
         }
     }
@@ -389,19 +404,20 @@ document.addEventListener('drop', (e) => {
     document.getElementById('dropOverlay').style.display = 'none';
     dragCounter = 0;
     const files = e.dataTransfer.files;
-    if (files.length > 0 && files[0].type === 'text/plain') {
+    if (files.length > 0 && (files[0].type === 'text/markdown' || files[0].name.endsWith('.md'))) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const content = e.target.result;
-            let fileName = files[0].name.replace('.txt', '');
-            if (localStorage.getItem(fileName)) {
+            let fileName = files[0].name.replace('.md', '');
+            if (getNoteData(fileName)) {
                 let counter = 1;
-                while (localStorage.getItem(`${fileName} (${counter})`)) {
+                while (getNoteData(`${fileName} (${counter})`)) {
                     counter++;
                 }
                 fileName = `${fileName} (${counter})`;
             }
-            localStorage.setItem(fileName, content);
+            setNoteData(fileName, content, []);
+            console.log('Imported file:', fileName, 'Data:', getNoteData(fileName));  // Add this line
             loadNote(fileName);
         };
         reader.readAsText(files[0]);

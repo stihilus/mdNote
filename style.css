@@ -394,10 +394,10 @@ textarea::-moz-selection {
 }
 
 #tagDisplay {
-    padding-left: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    background-color: rgb(21 21 21 / 80%);
+  padding-left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: rgb(21 21 21 / 80%);
 }
 
 .tag-pill {

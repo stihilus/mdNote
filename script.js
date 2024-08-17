@@ -21,16 +21,27 @@ function getFirstNote() {
 
 function initializeNotes() {
     if (localStorage.length === 0) {
-        const welcomeNote = "# Welcome to Markdown Notepad!\n\n" +
+        const welcomeNote = "# Welcome to mdNotepad!\n\n" +
+            "## Quick Tips:\n" +
+            "1. Click on a note title to edit it\n" +
+            "2. Use tags to organize your notes\n" +
+            "3. Filter notes by tags using the dropdown in the sidebar\n" +
+            "4. Access the Markdown syntax guide by clicking [md cheat sheet] in the sidebar\n\n" +
             "## Features:\n" +
-            "1. Create new documents with the 'new' button\n" +
-            "2. Edit document titles by clicking on them\n" +
-            "3. Export your notes as Markdown files\n" +
-            "4. Delete unwanted notes\n" +
-            "5. Resize the app window by dragging the bottom-right corner\n" +
-            "6. Drag and drop .md files into the app to load them\n" +
-            "7. Use the 'import' button to select and load .md files\n\n" +
-            "Enjoy writing in **Markdown**!";
+            "1. **Real-time Markdown Preview**: See your formatted text as you type\n" +
+            "2. **Document Management**: Create, edit, and delete notes with ease\n" +
+            "3. **Export Functionality**: Save your notes as Markdown files\n" +
+            "4. **Dark Theme**: Easy on the eyes for long writing sessions\n" +
+            "5. **Responsive Design**: Works on desktop and mobile browsers\n" +
+            "6. **Local Storage**: Your notes are saved in your browser's local storagem\n" +
+            "7. **Drag and Drop**: Import Markdown files by dragging them into the app\n" +
+            "8. **Import Feature**: Use the 'import' button to select and load .md files\n" +
+            "7. **Resizable Interface**: Adjust the app window by dragging the bottom-right corner\n" +
+            "8. **Drag and Drop**: Import Markdown files by dragging them into the app\n" +
+            "9. **Markdown Cheat Sheet**: Quick access to Markdown syntax reference\n" +
+            "10. **Tagging System**: Organize your notes using tags for quick retrieval\n" +
+            "Enjoy writing in **Markdown**!l\n"
+            ;
 
         const markdownGuide = `# Markdown Syntax Guide
 ## Headers

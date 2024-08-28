@@ -5,7 +5,7 @@ Markdown Notepad is a sleek, browser-based application designed for writing and 
 link to app:
 [mdNotepad](https://stihilus.github.io/mdNotepad/)
 
-<img width="1062" alt="image" src="https://github.com/user-attachments/assets/5222875e-7bfe-4b2a-acf2-2da088e3b9f0">
+![image](https://github.com/user-attachments/assets/83997807-75b9-43c4-8749-51dc75c3fd0f)
 
 ## Features
 

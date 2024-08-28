@@ -118,8 +118,8 @@ The HTML specification is maintained by the W3C.
 When $a \\ne 0$, there are two solutions to $(ax^2 + bx + c = 0)$ and they are 
 $$ x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a} $$`;
 
-        setNoteData("Welcome Note", welcomeNote, []);
-        setNoteData("Markdown Guide", markdownGuide, []);
+        setNoteData("Welcome Note", welcomeNote, [], new Date().toISOString());
+        setNoteData("Markdown Guide", markdownGuide, [], new Date().toISOString());
     }
     updateDocumentList();
     const firstNoteKey = getFirstNote();
@@ -142,7 +142,20 @@ function updateDocumentList() {
         }
 
         const li = document.createElement('li');
-        li.textContent = `├ ${key}`;
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = key; // Removed the ├ character
+        li.appendChild(titleSpan);
+
+        // Add creation date
+        if (noteData.createdAt) {
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = new Date(noteData.createdAt).toLocaleDateString();
+            dateSpan.style.color = '#999'; // Lighter gray color
+            dateSpan.style.fontSize = '0.8em';
+            dateSpan.style.marginLeft = '10px';
+            li.appendChild(dateSpan);
+        }
+
         li.onclick = () => loadNote(key);
         if (key === currentNote) {
             li.classList.add('active');
@@ -218,9 +231,17 @@ function autoSave() {
     renderMarkdown();
 }
 
+function showDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
 function deleteNote() {
     localStorage.removeItem(currentNote);
-    noteContent.value = '';
+    markdownEditor.value = '';
     currentNote = '';
     currentDocTitle.textContent = 'No document selected';
     updateDocumentList();
@@ -237,14 +258,14 @@ function newNote() {
         newNoteName = `New Note (${counter})`;
         counter++;
     }
-    localStorage.setItem(newNoteName, '');
+    setNoteData(newNoteName, '', [], new Date().toISOString());
     loadNote(newNoteName);
 }
 
 function exportNote() {
     if (currentNote) {
-        const content = localStorage.getItem(currentNote);
-        const blob = new Blob([content], { type: 'text/markdown' });
+        const noteData = getNoteData(currentNote);
+        const blob = new Blob([noteData.content], { type: 'text/markdown' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `${currentNote}.md`;
@@ -351,8 +372,23 @@ function handleFileUpload(event) {
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const content = e.target.result;
+            let content = e.target.result;
             let fileName = file.name.replace('.md', '');
+            let tags = [];
+            let createdAt = new Date().toISOString();
+
+            // Check if the content is JSON
+            try {
+                const jsonContent = JSON.parse(content);
+                if (jsonContent.content) {
+                    content = jsonContent.content;
+                    tags = jsonContent.tags || [];
+                    createdAt = jsonContent.createdAt || createdAt;
+                }
+            } catch (error) {
+                // If it's not JSON, treat it as pure Markdown content
+            }
+
             if (localStorage.getItem(fileName)) {
                 let counter = 1;
                 while (localStorage.getItem(`${fileName} (${counter})`)) {
@@ -360,7 +396,7 @@ function handleFileUpload(event) {
                 }
                 fileName = `${fileName} (${counter})`;
             }
-            setNoteData(fileName, content, []); // Use setNoteData instead of localStorage.setItem
+            setNoteData(fileName, content, tags, createdAt);
             loadNote(fileName);
         };
         reader.readAsText(file);
@@ -407,8 +443,23 @@ document.addEventListener('drop', (e) => {
     if (files.length > 0 && (files[0].type === 'text/markdown' || files[0].name.endsWith('.md'))) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const content = e.target.result;
+            let content = e.target.result;
             let fileName = files[0].name.replace('.md', '');
+            let tags = [];
+            let createdAt = new Date().toISOString();
+
+            // Check if the content is JSON
+            try {
+                const jsonContent = JSON.parse(content);
+                if (jsonContent.content) {
+                    content = jsonContent.content;
+                    tags = jsonContent.tags || [];
+                    createdAt = jsonContent.createdAt || createdAt;
+                }
+            } catch (error) {
+                // If it's not JSON, treat it as pure Markdown content
+            }
+
             if (getNoteData(fileName)) {
                 let counter = 1;
                 while (getNoteData(`${fileName} (${counter})`)) {
@@ -416,7 +467,7 @@ document.addEventListener('drop', (e) => {
                 }
                 fileName = `${fileName} (${counter})`;
             }
-            setNoteData(fileName, content, []);
+            setNoteData(fileName, content, tags, createdAt);
             console.log('Imported file:', fileName, 'Data:', getNoteData(fileName));  // Add this line
             loadNote(fileName);
         };
@@ -547,8 +598,8 @@ function getNoteData(key) {
     }
 }
 
-function setNoteData(key, content, tags = []) {
-    localStorage.setItem(key, JSON.stringify({ content, tags }));
+function setNoteData(key, content, tags = [], createdAt = new Date().toISOString()) {
+    localStorage.setItem(key, JSON.stringify({ content, tags, createdAt }));
 }
 
 document.getElementById('tagInput').addEventListener('keypress', addTag);
@@ -558,3 +609,67 @@ document.getElementById('tagFilter').addEventListener('change', (e) => {
 
 markdownEditor.addEventListener('input', autoSave);
 initializeNotes();
+
+// Make the notepad draggable
+const notepad = document.querySelector('.notepad');
+const header = document.querySelector('.header');
+
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+
+header.addEventListener('mousedown', dragStart);
+document.addEventListener('mousemove', drag);
+document.addEventListener('mouseup', dragEnd);
+
+function dragStart(e) {
+    const rect = notepad.getBoundingClientRect();
+    initialX = e.clientX - rect.left;
+    initialY = e.clientY - rect.top;
+
+    if (e.target === header) {
+        isDragging = true;
+        notepad.style.transition = 'none'; // Disable transition during drag
+        notepad.style.transform = 'none'; // Remove centering transform
+        notepad.style.left = `${rect.left}px`;
+        notepad.style.top = `${rect.top}px`;
+    }
+}
+
+function drag(e) {
+    if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+
+        setTranslate(currentX, currentY, notepad);
+    }
+}
+
+function dragEnd(e) {
+    isDragging = false;
+    // Save the final position
+    const rect = notepad.getBoundingClientRect();
+    xOffset = rect.left;
+    yOffset = rect.top;
+}
+
+function setTranslate(xPos, yPos, el) {
+    el.style.left = `${xPos}px`;
+    el.style.top = `${yPos}px`;
+}
+
+// Add this function to your existing code
+function initializeNotepadPosition() {
+    const rect = notepad.getBoundingClientRect();
+    notepad.style.transform = 'none';
+    notepad.style.left = `${rect.left}px`;
+    notepad.style.top = `${rect.top}px`;
+}
+
+// Call this function after the page loads
+window.addEventListener('load', initializeNotepadPosition);

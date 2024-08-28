@@ -25,7 +25,11 @@ body {
   resize: both;
   max-width: 100vw;
   max-height: 100vh;
-  position: relative;
+  position: absolute; /* Change from relative to absolute */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Center the notepad */
+  transition: none; /* Remove transition for smoother dragging */
 }
 
 .header {
@@ -34,6 +38,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: move; /* Add this line to show a move cursor */
+  user-select: none; /* Add this line to prevent text selection while dragging */
 }
 
 .app-title {
@@ -445,4 +451,21 @@ textarea::-moz-selection {
 #tagFilter:focus {
   outline: none;
   border-color: #FFB45D;
+}
+
+#documentList li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+#documentList li span:first-child {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+#documentList li span:last-child {
+  font-size: 0.8em;
+  color: #999;
 }

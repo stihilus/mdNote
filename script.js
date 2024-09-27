@@ -40,7 +40,7 @@ function initializeNotes() {
             "8. **Drag and Drop**: Import Markdown files by dragging them into the app\n" +
             "9. **Markdown Cheat Sheet**: Quick access to Markdown syntax reference\n" +
             "10. **Tagging System**: Organize your notes using tags for quick retrieval\n" +
-            "Enjoy writing in **Markdown**!l\n"
+            "Enjoy writing in **Markdown**!\n"
             ;
 
         const markdownGuide = `# Markdown Syntax Guide
@@ -221,7 +221,8 @@ function saveNote() {
     if (currentNote) {
         const noteData = getNoteData(currentNote);
         noteData.content = markdownEditor.value;
-        setNoteData(currentNote, noteData.content, noteData.tags);
+        noteData.createdAt = noteData.createdAt || new Date().toISOString(); // Ensure createdAt is saved
+        setNoteData(currentNote, noteData.content, noteData.tags, noteData.createdAt); // Save tags and createdAt
         updateDocumentList();
     }
 }
